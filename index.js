@@ -54,6 +54,7 @@ var Gauges = {
   LastUSDPrice: undefined,
   LastThugsPerBNB: undefined,
 };
+
 var ContractInterfaces;
 
 const init = async () => {
@@ -83,7 +84,9 @@ const UpdateLastUSDPrice = async (url) => {
     //Get bnb price
     BNB_USD_PRICE = data[Constants.BNB_BUSD_PAIR].last_price;
     //fetch how much thugs one bnb buys
-    ThugsStats.LastThugsPerBNB = parseFloat(data[Constants.THUGS_BNB_PAIR].last_price);
+    ThugsStats.LastThugsPerBNB = parseFloat(
+      data[Constants.THUGS_BNB_PAIR].last_price
+    );
     ThugsStats.LastUSDPrice = parseFloat(
       ((1 / ThugsStats.LastThugsPerBNB) * BNB_USD_PRICE).toFixed(5)
     );
