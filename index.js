@@ -11,15 +11,18 @@ const app = express();
 const port = process.env.PORT || 3001;
 const metricsInterval = Prometheus.collectDefaultMetrics();
 
-//Bscswap stuff
-//BscSwap api pair setting
-const THUGS_BNB_PAIR =
-  "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c_0xE10e9822A5de22F8761919310DDA35CD997d63c0";
-//To get current usd price of bnb
-const BNB_BUSD_PAIR =
-  "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c_0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56";
-//API path to ticker
-const TICKER_API_URL = "https://api.bscswap.com/tickers";
+const Constants = {
+  //Bscswap stuff
+  //BscSwap api pair setting
+  THUGS_BNB_PAIR:
+    "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c_0xE10e9822A5de22F8761919310DDA35CD997d63c0",
+  //To get current usd price of bnb
+  BNB_BUSD_PAIR:
+    "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c_0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+  //API path to ticker
+  TICKER_API_URL: "https://api.bscswap.com/tickers",
+};
+
 var BNB_USD_PRICE = 0;
 
 // Obj containing various stats
@@ -74,17 +77,19 @@ const init = async () => {
   await refreshData();
 };
 const UpdateLastUSDPrice = async (url) => {
-    try {
-      const response = await axios.get(url);
-      const data = response.data;
-      //Get bnb price
-      BNB_USD_PRICE = data[BNB_BUSD_PAIR].last_price;
-      //fetch how much thugs one bnb buys
-      ThugsStats.LastThugsPerBNB = parseFloat(data[THUGS_BNB_PAIR].last_price);
-      ThugsStats.LastUSDPrice = parseFloat(((1 / ThugsStats.LastThugsPerBNB) * BNB_USD_PRICE).toFixed(5));
-    } catch (error) {
-      console.log(error);
-    }
+  try {
+    const response = await axios.get(url);
+    const data = response.data;
+    //Get bnb price
+    BNB_USD_PRICE = data[Constants.BNB_BUSD_PAIR].last_price;
+    //fetch how much thugs one bnb buys
+    ThugsStats.LastThugsPerBNB = parseFloat(data[Constants.THUGS_BNB_PAIR].last_price);
+    ThugsStats.LastUSDPrice = parseFloat(
+      ((1 / ThugsStats.LastThugsPerBNB) * BNB_USD_PRICE).toFixed(5)
+    );
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const getTokenstats = async () => {
@@ -123,9 +128,9 @@ const getTokenstats = async () => {
   ThugsStats.TotalBurnt = parseFloat(ThugsStats.TotalBurnt.toFixed(8));
 
   //Update usd price
-  await UpdateLastUSDPrice(TICKER_API_URL);
+  await UpdateLastUSDPrice(Constants.TICKER_API_URL);
   //Log stats for debug
-  console.log(ThugsStats);
+  // console.log(ThugsStats);
 };
 
 const InitGauges = async () => {
